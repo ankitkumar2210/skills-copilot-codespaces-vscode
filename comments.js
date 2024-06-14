@@ -1,60 +1,42 @@
 // create web server
-// create web server
-import express, { json } from 'express';
+const express = require('express');
 const app = express();
 const port = 3000;
 
-// use the middleware to parse the body of the request
-app.use(json());
+// create path
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'public')));
 
-// import the comments data
-import comments, { find, length, push, indexOf, splice } from './comments.json';
+// create body-parser
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// get all the comments
+// create comments
+const comments = [
+    {
+        name: 'Stefan',
+        comment: 'Today is a great day!'
+    },
+    {
+        name: 'John',
+        comment: 'I love this blog post!'
+    }
+];
+
+// create comments route
 app.get('/comments', (req, res) => {
-  res.json(comments);
+    res.json(comments);
 });
 
-// get one comment by id
-app.get('/comments/:id', (req, res) => {
-  const comment = find(comment => comment.id === parseInt(req.params.id));
-  if (!comment) {
-    return res.status(404).send('The comment with the given ID was not found');
-  }
-  res.json(comment);
-});
-
-// create a new comment
+// create add comment route
 app.post('/comments', (req, res) => {
-  const comment = {
-    id: length + 1,
-    text: req.body.text
-  };
-  push(comment);
-  res.json(comment);
+    const comment = req.body;
+    comments.push(comment);
+    res.json(comment);
 });
 
-// update a comment
-app.put('/comments/:id', (req, res) => {
-  const comment = find(comment => comment.id === parseInt(req.params.id));
-  if (!comment) {
-    return res.status(404).send('The comment with the given ID was not found');
-  }
-  comment.text = req.body.text;
-  res.json(comment);
-});
-
-// delete a comment
-app.delete('/comments/:id', (req, res) => {
-  const comment = find(comment => comment.id === parseInt(req.params.id));
-  if (!comment) {
-    return res.status(404).send('The comment with the given ID was not found');
-  }
-  const index = indexOf(comment);
-  splice(index, 1);
-  res.json(comment);
-});
-
+// create server
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+    console.log(`Server is running on http://localhost:${port}`);
 });
